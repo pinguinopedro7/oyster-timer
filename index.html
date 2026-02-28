@@ -4,19 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
-  <title>Oyster Timer</title>
+
+  <!-- iOS “standalone / fullscreen” hints -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="logo.png" />
+
+  <title>Pearl Point Oyster Freshness Tracker</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main id="app" class="style-clean">
-    <header class="topbar">
+    <header class="topbar" id="topbar">
       <div class="brand">
-        <div class="dot"></div>
-        <div>
-          <div class="title">Oyster Timer</div>
-          <div class="subtitle">Time since pulled from the water</div>
+        <div class="mark">
+          <img src="logo.png" alt="Pearl Point Oyster Co." />
+        </div>
+        <div class="brandtext">
+          <div id="appTitle" class="title" title="Editable in settings">Pearl Point Oyster Freshness Tracker</div>
+          <div class="subtitle">Offline • Live timer • iPad-friendly</div>
         </div>
       </div>
 
@@ -25,24 +33,11 @@
       </button>
     </header>
 
-    <section class="card timer-card">
+    <section id="timerSection" class="card timer-card">
       <div class="timer-row">
-        <div class="label">TIME SINCE PULLED</div>
+        <div id="timerLabel" class="label">TIME SINCE PULLED</div>
         <div id="liveTimer" class="timer">—</div>
         <div id="pulledAtText" class="small">Pulled at: —</div>
-      </div>
-
-      <div class="controls">
-        <label class="field">
-          <span>Pulled at</span>
-          <input id="pulledAtInput" type="datetime-local" />
-        </label>
-
-        <div class="btnrow">
-          <button id="setNow" class="btn">Set to Now</button>
-          <button id="saveTime" class="btn primary">Save</button>
-          <button id="clearTime" class="btn danger">Clear</button>
-        </div>
       </div>
 
       <div id="status" class="status" role="status" aria-live="polite"></div>
@@ -51,11 +46,61 @@
     <section id="settingsPanel" class="card settings hidden">
       <div class="settings-grid">
         <div class="setting">
-          <div class="setting-title">Background</div>
-          <div class="setting-desc">Solid, gradient, or your own photo.</div>
+          <div class="setting-title">Timer</div>
+          <div class="setting-desc">Set the pull time + customize the labels.</div>
 
           <label class="field">
-            <span>Type</span>
+            <span>Pulled at</span>
+            <input id="pulledAtInput" type="datetime-local" />
+          </label>
+
+          <div class="btnrow">
+            <button id="setNow" class="btn">Set to Now</button>
+            <button id="saveTime" class="btn primary">Save Time</button>
+            <button id="clearTime" class="btn danger">Clear</button>
+          </div>
+
+          <label class="field">
+            <span>Title (editable)</span>
+            <input id="titleInput" type="text" placeholder="Pearl Point Oyster Freshness Tracker" />
+          </label>
+
+          <label class="field">
+            <span>Text above timer (editable)</span>
+            <input id="labelInput" type="text" placeholder="TIME SINCE PULLED" />
+          </label>
+        </div>
+
+        <div class="setting">
+          <div class="setting-title">Display</div>
+          <div class="setting-desc">Borderless fullscreen mode + show/hide bits.</div>
+
+          <label class="field inline">
+            <span>Borderless mode</span>
+            <input id="borderlessToggle" type="checkbox" />
+          </label>
+
+          <label class="field inline">
+            <span>Hide header</span>
+            <input id="hideHeaderToggle" type="checkbox" />
+          </label>
+
+          <label class="field inline">
+            <span>Hide “Pulled at” line</span>
+            <input id="hidePulledAtToggle" type="checkbox" />
+          </label>
+
+          <div class="small">
+            Best true fullscreen on iPad: Safari → Share → <strong>Add to Home Screen</strong>.
+          </div>
+        </div>
+
+        <div class="setting">
+          <div class="setting-title">Look & Feel</div>
+          <div class="setting-desc">Background, font size, style preset.</div>
+
+          <label class="field">
+            <span>Background type</span>
             <select id="bgType">
               <option value="solid">Solid</option>
               <option value="gradient">Gradient</option>
@@ -93,15 +138,10 @@
             <div class="small">Photo is stored on-device (offline) using local storage (compressed).</div>
             <button id="removePhoto" class="btn ghost">Remove Photo</button>
           </div>
-        </div>
-
-        <div class="setting">
-          <div class="setting-title">Text</div>
-          <div class="setting-desc">Font size + font style.</div>
 
           <label class="field">
             <span>Font size</span>
-            <input id="fontScale" type="range" min="70" max="160" step="1" />
+            <input id="fontScale" type="range" min="70" max="200" step="1" />
           </label>
 
           <label class="field">
@@ -113,14 +153,9 @@
               <option value="round">Rounded</option>
             </select>
           </label>
-        </div>
-
-        <div class="setting">
-          <div class="setting-title">Style</div>
-          <div class="setting-desc">Different card / glow looks.</div>
 
           <label class="field">
-            <span>Preset</span>
+            <span>Style preset</span>
             <select id="stylePreset">
               <option value="clean">Clean</option>
               <option value="dock">Dock</option>
@@ -140,8 +175,8 @@
       </div>
     </section>
 
-    <footer class="footer small">
-      Tip: On iPad Safari tap <strong>Share</strong> → <strong>Add to Home Screen</strong> for a full-screen offline app.
+    <footer class="footer small" id="footer">
+      Tip: Add to Home Screen for the cleanest iPad full-screen experience.
     </footer>
   </main>
 
