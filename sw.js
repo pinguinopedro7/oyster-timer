@@ -1,4 +1,4 @@
-const CACHE_NAME = "pearl-point-freshness-cache-v4";
+const CACHE_NAME = "pearl-point-freshness-cache-v6";
 const ASSETS = [
   "./",
   "./index.html",
