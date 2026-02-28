@@ -33,24 +33,26 @@
       </button>
     </header>
 
-    <section id="timerSection" class="card timer-card">
+    <section id="timerSection" class="card timer-card" aria-live="polite">
       <div class="timer-row">
-        <div id="timerLabel" class="label">TIME SINCE PULLED</div>
-        <div id="liveTimer" class="timer">—</div>
-        <div id="pulledAtText" class="small">Pulled at: —</div>
+        <div id="timerLabel" class="label">TIME SINCE HARVEST</div>
+        <div id="liveTimer" class="timer" aria-atomic="true">—</div>
+        <div id="pulledAtText" class="small">Harvested at: —</div>
       </div>
 
       <div id="status" class="status" role="status" aria-live="polite"></div>
     </section>
 
-    <section id="settingsPanel" class="card settings hidden">
+    <!-- Settings panel -->
+    <section id="settingsPanel" class="card settings hidden" aria-hidden="true">
       <div class="settings-grid">
+        <!-- Timer / Text -->
         <div class="setting">
           <div class="setting-title">Timer</div>
-          <div class="setting-desc">Set the pull time + customize the labels.</div>
+          <div class="setting-desc">Set the harvest time and editable labels.</div>
 
           <label class="field">
-            <span>Pulled at</span>
+            <span>Harvested at</span>
             <input id="pulledAtInput" type="datetime-local" />
           </label>
 
@@ -62,18 +64,19 @@
 
           <label class="field">
             <span>Title (editable)</span>
-            <input id="titleInput" type="text" placeholder="Pearl Point Oyster Freshness Tracker" />
+            <input id="titleInput" type="text" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="true" placeholder="Pearl Point Oyster Freshness Tracker" />
           </label>
 
           <label class="field">
             <span>Text above timer (editable)</span>
-            <input id="labelInput" type="text" placeholder="TIME SINCE HARVEST" />
+            <input id="labelInput" type="text" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="true" placeholder="TIME SINCE HARVEST" />
           </label>
         </div>
 
+        <!-- Display -->
         <div class="setting">
           <div class="setting-title">Display</div>
-          <div class="setting-desc">Borderless fullscreen mode + show/hide bits.</div>
+          <div class="setting-desc">Borderless/fullscreen + visibility toggles.</div>
 
           <label class="field inline">
             <span>Borderless mode</span>
@@ -86,64 +89,23 @@
           </label>
 
           <label class="field inline">
-            <span>Hide “Pulled at” line</span>
+            <span>Hide “Harvested at” row</span>
             <input id="hidePulledAtToggle" type="checkbox" />
           </label>
-
-          <div class="small">
-            Best true fullscreen on iPad: Safari → Share → <strong>Add to Home Screen</strong>.
-          </div>
         </div>
 
+        <!-- Look & Feel -->
         <div class="setting">
           <div class="setting-title">Look & Feel</div>
-          <div class="setting-desc">Background, font size, style preset.</div>
+          <div class="setting-desc">Background, font size, label size, style.</div>
 
           <label class="field">
-            <span>Background type</span>
-            <select id="bgType">
-              <option value="solid">Solid</option>
-              <option value="gradient">Gradient</option>
-              <option value="photo">Photo</option>
-            </select>
+            <span>Label size (“Time since …”)</span>
+            <input id="labelScale" type="range" min="70" max="220" step="1" />
           </label>
 
-          <div id="bgSolidControls">
-            <label class="field">
-              <span>Color</span>
-              <input id="bgSolidColor" type="color" />
-            </label>
-          </div>
-
-          <div id="bgGradientControls" class="hidden">
-            <label class="field">
-              <span>Color A</span>
-              <input id="bgGradA" type="color" />
-            </label>
-            <label class="field">
-              <span>Color B</span>
-              <input id="bgGradB" type="color" />
-            </label>
-            <label class="field">
-              <span>Angle</span>
-              <input id="bgGradAngle" type="range" min="0" max="360" step="1" />
-            </label>
-          </div>
-
-          <div id="bgPhotoControls" class="hidden">
-            <label class="field">
-              <span>Choose photo</span>
-              <input id="bgPhotoFile" type="file" accept="image/*" />
-            </label>
-            <div class="small">Photo is stored on-device (offline) using local storage (compressed).</div>
-            <button id="removePhoto" class="btn ghost">Remove Photo</button>
-          </div>
-<label class="field">
-  <span>Label size (“Time since …”)</span>
-  <input id="labelScale" type="range" min="70" max="220" step="1" />
-</label>
           <label class="field">
-            <span>Font size</span>
+            <span>Font size (timer)</span>
             <input id="fontScale" type="range" min="80" max="260" step="1" />
           </label>
 
