@@ -1,17 +1,16 @@
-// Simple offline cache for the app shell
-const CACHE_NAME = "oyster-timer-cache-v1";
+const CACHE_NAME = "pearl-point-freshness-cache-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
-  "./manifest.json"
+  "./sw.js",
+  "./manifest.json",
+  "./logo.png"
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
@@ -26,7 +25,6 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-  // Cache-first for app shell; fallback to network.
   event.respondWith(
     caches.match(req).then((cached) => cached || fetch(req).catch(() => caches.match("./index.html")))
   );
