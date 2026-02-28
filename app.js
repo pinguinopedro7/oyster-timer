@@ -52,7 +52,7 @@ const DEFAULT_STATE = {
 
   text: {
     title: "Pearl Point Oyster Freshness Tracker",
-    label: "TIME SINCE PULLED"
+    label: "TIME SINCE HARVEST"
   },
 
   display: {
@@ -155,14 +155,20 @@ function tick() {
 }
 
 /* datetime-local helpers */
-function toDatetimeLocalValue(iso) {
-  const d = new Date(iso);
-  const yyyy = d.getFullYear();
-  const mm = pad2(d.getMonth() + 1);
-  const dd = pad2(d.getDate());
-  const hh = pad2(d.getHours());
-  const mi = pad2(d.getMinutes());
-  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+function fromDatetimeLocalValue(val) {
+  // Manual parse for iPad Safari reliability
+  if (!val) return "";
+
+  const [datePart, timePart] = val.split("T");
+  if (!datePart || !timePart) return "";
+
+  const [y, m, d] = datePart.split("-").map(Number);
+  const [hh, mm] = timePart.split(":").map(Number);
+
+  if ([y, m, d, hh, mm].some((n) => Number.isNaN(n))) return "";
+
+  const local = new Date(y, m - 1, d, hh, mm, 0, 0);
+  return local.toISOString();
 }
 
 function fromDatetimeLocalValue(val) {
