@@ -6,7 +6,6 @@ const el = (id) => document.getElementById(id);
 
 const appEl = el("app");
 const topbarEl = el("topbar");
-const footerEl = el("footer");
 
 const appTitleEl = el("appTitle");
 const liveTimerEl = el("liveTimer");
@@ -29,23 +28,14 @@ const borderlessToggleEl = el("borderlessToggle");
 const hideHeaderToggleEl = el("hideHeaderToggle");
 const hidePulledAtToggleEl = el("hidePulledAtToggle");
 
-const bgTypeEl = el("bgType");
-const bgSolidControls = el("bgSolidControls");
-const bgGradientControls = el("bgGradientControls");
-const bgPhotoControls = el("bgPhotoControls");
-
-const bgSolidColorEl = el("bgSolidColor");
-const bgGradAEl = el("bgGradA");
-const bgGradBEl = el("bgGradB");
-const bgGradAngleEl = el("bgGradAngle");
-const bgPhotoFileEl = el("bgPhotoFile");
-const removePhotoBtn = el("removePhoto");
-
+const labelScaleEl = el("labelScale");
 const fontScaleEl = el("fontScale");
 const fontFamilyEl = el("fontFamily");
 const stylePresetEl = el("stylePreset");
 const glowEl = el("glow");
 const resetSettingsBtn = el("resetSettings");
+
+const bgTypeEl = el("bgType"); // kept for compatibility if you add background controls later
 
 const DEFAULT_STATE = {
   pulledAtISO: "",
@@ -63,14 +53,15 @@ const DEFAULT_STATE = {
 
   ui: {
     bg: {
-      type: "solid", // solid | gradient | photo
+      type: "solid",
       solid: "#0b1220",
       gradA: "#0b1220",
       gradB: "#163257",
       gradAngle: 135,
       photoDataUrl: ""
     },
-    fontScale: 120,
+    fontScale: 140,
+    labelScale: 100,
     fontFamily: "system",
     stylePreset: "clean",
     glow: 25
@@ -141,20 +132,21 @@ function tick() {
   const iso = state.pulledAtISO;
   if (!iso) {
     liveTimerEl.textContent = "—";
-    pulledAtTextEl.textContent = "Pulled at: —";
+    pulledAtTextEl.textContent = "Harvested at: —";
     return;
   }
   const t0 = new Date(iso).getTime();
   if (Number.isNaN(t0)) {
     liveTimerEl.textContent = "—";
-    pulledAtTextEl.textContent = "Pulled at: —";
+    pulledAtTextEl.textContent = "Harvested at: —";
     return;
   }
   liveTimerEl.textContent = formatDuration(Date.now() - t0);
-  pulledAtTextEl.textContent = `Pulled at: ${fmtPulledAtLabel(iso)}`;
+  pulledAtTextEl.textContent = `Harvested at: ${fmtPulledAtLabel(iso)}`;
 }
 
 /* datetime-local helpers */
+/* ---- REPLACED: manual parse to fix iPad datetime-local issues ---- */
 function fromDatetimeLocalValue(val) {
   // Manual parse for iPad Safari reliability
   if (!val) return "";
@@ -171,49 +163,17 @@ function fromDatetimeLocalValue(val) {
   return local.toISOString();
 }
 
-function fromDatetimeLocalValue(val) {
-  const d = new Date(val); // interpreted as local time
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toISOString();
-}
-
-/* Photo handling (compress) */
-async function fileToCompressedDataUrl(file, maxW = 1800, quality = 0.78) {
-  const img = await loadImage(file);
-  const canvas = document.createElement("canvas");
-  const ratio = img.width / img.height;
-
-  let w = img.width;
-  let h = img.height;
-  if (w > maxW) { w = maxW; h = Math.round(w / ratio); }
-
-  canvas.width = w;
-  canvas.height = h;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0, w, h);
-
-  return canvas.toDataURL("image/jpeg", quality);
-}
-
-function loadImage(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
-    img.src = url;
-  });
+function toDatetimeLocalValue(iso) {
+  const d = new Date(iso);
+  const yyyy = d.getFullYear();
+  const mm = pad2(d.getMonth() + 1);
+  const dd = pad2(d.getDate());
+  const hh = pad2(d.getHours());
+  const mi = pad2(d.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
 }
 
 /* UI apply */
-function updateBgControlVisibility() {
-  const t = bgTypeEl.value;
-  bgSolidControls.classList.toggle("hidden", t !== "solid");
-  bgGradientControls.classList.toggle("hidden", t !== "gradient");
-  bgPhotoControls.classList.toggle("hidden", t !== "photo");
-}
-
 function applyUI() {
   // Text
   document.title = state.text.title || DEFAULT_STATE.text.title;
@@ -223,15 +183,15 @@ function applyUI() {
   // Display toggles
   document.body.classList.toggle("borderless", !!state.display.borderless);
   topbarEl.classList.toggle("hidden", !!state.display.hideHeader);
-  footerEl.classList.toggle("hidden", !!state.display.hideHeader);
   pulledAtTextEl.classList.toggle("hidden", !!state.display.hidePulledAtLine);
 
   // Style preset
   appEl.classList.remove("style-clean", "style-dock", "style-bold");
   appEl.classList.add(`style-${state.ui.stylePreset}`);
 
-  // Font scale + glow
+  // Font scale + glow + label scale
   document.documentElement.style.setProperty("--scale", String(state.ui.fontScale));
+  document.documentElement.style.setProperty("--labelScale", String(state.ui.labelScale));
   document.documentElement.style.setProperty("--glow", String(state.ui.glow));
 
   // Font family
@@ -248,23 +208,8 @@ function applyUI() {
   }
   document.documentElement.style.setProperty("--font", font);
 
-  // Background
-  const bg = state.ui.bg;
-  if (bg.type === "solid") {
-    appEl.style.backgroundImage = "none";
-    document.documentElement.style.setProperty("--bg", bg.solid);
-  } else if (bg.type === "gradient") {
-    const ang = Number(bg.gradAngle) || 135;
-    appEl.style.backgroundImage = `linear-gradient(${ang}deg, ${bg.gradA}, ${bg.gradB})`;
-    document.documentElement.style.setProperty("--bg", "#0b1220");
-  } else if (bg.type === "photo") {
-    appEl.style.backgroundImage = bg.photoDataUrl ? `url("${bg.photoDataUrl}")` : "none";
-    document.documentElement.style.setProperty("--bg", "#0b1220");
-  }
-
   // Inputs reflect state
   pulledAtInputEl.value = state.pulledAtISO ? toDatetimeLocalValue(state.pulledAtISO) : "";
-
   titleInputEl.value = state.text.title || "";
   labelInputEl.value = state.text.label || "";
 
@@ -272,18 +217,11 @@ function applyUI() {
   hideHeaderToggleEl.checked = !!state.display.hideHeader;
   hidePulledAtToggleEl.checked = !!state.display.hidePulledAtLine;
 
-  bgTypeEl.value = bg.type;
-  bgSolidColorEl.value = bg.solid;
-  bgGradAEl.value = bg.gradA;
-  bgGradBEl.value = bg.gradB;
-  bgGradAngleEl.value = String(bg.gradAngle);
-
-  fontScaleEl.value = String(state.ui.fontScale);
-  fontFamilyEl.value = state.ui.fontFamily;
-  stylePresetEl.value = state.ui.stylePreset;
-  glowEl.value = String(state.ui.glow);
-
-  updateBgControlVisibility();
+  labelScaleEl.value = String(state.ui.labelScale || 100);
+  fontScaleEl.value = String(state.ui.fontScale || 140);
+  fontFamilyEl.value = state.ui.fontFamily || "system";
+  stylePresetEl.value = state.ui.stylePreset || "clean";
+  glowEl.value = String(state.ui.glow || 25);
 }
 
 /* Events */
@@ -346,64 +284,13 @@ hidePulledAtToggleEl.addEventListener("change", () => {
   applyUI();
 });
 
-// Background controls
-bgTypeEl.addEventListener("change", () => {
-  state.ui.bg.type = bgTypeEl.value;
-  updateBgControlVisibility();
+// Label + font scale listeners
+labelScaleEl.addEventListener("input", () => {
+  state.ui.labelScale = Number(labelScaleEl.value);
   saveState();
   applyUI();
 });
 
-bgSolidColorEl.addEventListener("input", () => {
-  state.ui.bg.solid = bgSolidColorEl.value;
-  saveState();
-  applyUI();
-});
-
-bgGradAEl.addEventListener("input", () => {
-  state.ui.bg.gradA = bgGradAEl.value;
-  saveState();
-  applyUI();
-});
-
-bgGradBEl.addEventListener("input", () => {
-  state.ui.bg.gradB = bgGradBEl.value;
-  saveState();
-  applyUI();
-});
-
-bgGradAngleEl.addEventListener("input", () => {
-  state.ui.bg.gradAngle = Number(bgGradAngleEl.value);
-  saveState();
-  applyUI();
-});
-
-bgPhotoFileEl.addEventListener("change", async () => {
-  const f = bgPhotoFileEl.files?.[0];
-  if (!f) return;
-  try {
-    const dataUrl = await fileToCompressedDataUrl(f);
-    state.ui.bg.photoDataUrl = dataUrl;
-    state.ui.bg.type = "photo";
-    bgTypeEl.value = "photo";
-    saveState();
-    applyUI();
-    setStatus("Photo saved for offline use.");
-  } catch {
-    setStatus("Could not load that photo.");
-  } finally {
-    bgPhotoFileEl.value = "";
-  }
-});
-
-removePhotoBtn.addEventListener("click", () => {
-  state.ui.bg.photoDataUrl = "";
-  saveState();
-  applyUI();
-  setStatus("Photo removed.");
-});
-
-// Look & feel
 fontScaleEl.addEventListener("input", () => {
   state.ui.fontScale = Number(fontScaleEl.value);
   saveState();
@@ -437,7 +324,7 @@ resetSettingsBtn.addEventListener("click", () => {
   setStatus("Settings reset.");
 });
 
-/* Init */
+/* Init tick + UI */
 applyUI();
 tick();
 setInterval(tick, 1000);
