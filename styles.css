@@ -9,6 +9,7 @@
 
   --scale: 140; /* percent (timer) */
   --glow: 25;   /* 0..100 */
+  --labelScale: 100;
   --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -104,12 +105,6 @@ body{
 .timer-row{ text-align:center; }
 
 /* Bigger label above timer */
-.label{
-  font-size: 14px;
-  letter-spacing: .18em;
-  color: var(--muted);
-  font-weight: 900;
-}
 
 /* MUCH BIGGER TIMER */
 .timer{
@@ -119,7 +114,12 @@ body{
   font-size: calc(72px * (var(--scale) / 100)); /* <-- bigger base */
   text-shadow: 0 0 calc(var(--glow) * 0.45px) rgba(255,255,255,.35);
 }
-
+.label{
+  font-size: calc(14px * (var(--labelScale) / 100));
+  letter-spacing: .18em;
+  color: var(--muted);
+  font-weight: 900;
+}
 /* Bigger pulled-at line */
 .small{
   font-size: 16px;
