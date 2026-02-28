@@ -7,7 +7,7 @@
   --shadow: 0 14px 40px rgba(0,0,0,.35);
   --radius: 18px;
 
-  --scale: 120; /* percent */
+  --scale: 140; /* percent (timer) */
   --glow: 25;   /* 0..100 */
   --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
@@ -50,9 +50,9 @@ body{
 }
 
 .mark{
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 64px;   /* bigger logo */
+  height: 64px;
+  border-radius: 16px;
   overflow:hidden;
   border: 1px solid rgba(255,255,255,.12);
   background: rgba(0,0,0,.18);
@@ -66,14 +66,22 @@ body{
 }
 
 .brandtext{ min-width:0; }
+
+/* BIGGER TITLE */
 .title{
-  font-weight:800;
-  letter-spacing:.2px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-weight: 900;
+  letter-spacing: .2px;
+  font-size: 26px;         /* <-- bigger */
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.subtitle{ font-size:12px; color: var(--muted); margin-top:2px; }
+.subtitle{
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
 
 /* Cards */
 .card{
@@ -94,21 +102,37 @@ body{
 }
 
 .timer-row{ text-align:center; }
+
+/* Bigger label above timer */
 .label{
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: .18em;
   color: var(--muted);
-  font-weight: 800;
-}
-.timer{
-  margin: 12px 0 6px;
   font-weight: 900;
-  line-height: 1.03;
-  font-size: calc(44px * (var(--scale) / 100));
+}
+
+/* MUCH BIGGER TIMER */
+.timer{
+  margin: 14px 0 10px;
+  font-weight: 950;
+  line-height: 1.00;
+  font-size: calc(72px * (var(--scale) / 100)); /* <-- bigger base */
   text-shadow: 0 0 calc(var(--glow) * 0.45px) rgba(255,255,255,.35);
 }
-.small{ font-size: 13px; color: var(--muted); }
-.status{ min-height: 18px; font-size: 13px; color: var(--muted); text-align: center; margin-top: 14px; }
+
+/* Bigger pulled-at line */
+.small{
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.status{
+  min-height: 18px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 14px;
+}
 
 /* Inputs */
 .field{ display:flex; flex-direction:column; gap: 6px; margin-top: 10px; }
@@ -179,7 +203,7 @@ input[type="checkbox"]{
 }
 .style-bold .timer{ letter-spacing: .03em; text-transform: uppercase; }
 
-/* Borderless mode (no card borders, no shadows, edge-to-edge) */
+/* Borderless mode */
 .borderless #app{ padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); gap: 0; }
 .borderless .card{
   background: transparent;
