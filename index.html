@@ -67,7 +67,7 @@
 
           <label class="field">
             <span>Text above timer (editable)</span>
-            <input id="labelInput" type="text" placeholder="TIME SINCE PULLED" />
+            <input id="labelInput" type="text" placeholder="TIME SINCE HARVEST" />
           </label>
         </div>
 
@@ -138,7 +138,10 @@
             <div class="small">Photo is stored on-device (offline) using local storage (compressed).</div>
             <button id="removePhoto" class="btn ghost">Remove Photo</button>
           </div>
-
+<label class="field">
+  <span>Label size (“Time since …”)</span>
+  <input id="labelScale" type="range" min="70" max="220" step="1" />
+</label>
           <label class="field">
             <span>Font size</span>
             <input id="fontScale" type="range" min="80" max="260" step="1" />
